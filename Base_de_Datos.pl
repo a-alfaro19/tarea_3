@@ -1,38 +1,66 @@
-<datos> ::= <aeropuertos> <vuelos>
+% Aeropuertos
+aeropuerto(sjo, 'San José, Costa Rica').
+aeropuerto(pty, 'Ciudad de Panamá, Panamá').
+aeropuerto(jfk, 'New York, Estados Unidos').
+aeropuerto(phx, 'Phoenix, Arizona').
+aeropuerto(lax, 'Los Ángeles, California').
 
-<aeropuertos> ::= <aeropuerto> | <aeropuerto> <aeropuertos>
+% Vuelos desde SJO
+vuelo(cm001, sjo, pty, 'Copa Airlines', economica, 1, 120).
+vuelo(cm002, sjo, jfk, 'Copa Airlines', negocios, 5, 420).
+vuelo(cm003, sjo, phx, 'Copa Airlines', economica, 6, 480).
+vuelo(cm004, sjo, lax, 'Copa Airlines', economica, 7, 520).
+vuelo(cm005, sjo, jfk, 'Copa Airlines', negocios, 5, 410).
+vuelo(cm006, sjo, pty, 'Copa Airlines', economica, 1, 130).
+vuelo(cm007, sjo, phx, 'Copa Airlines', negocios, 6, 500).
+vuelo(cm008, sjo, lax, 'Copa Airlines', economica, 7, 510).
+vuelo(cm009, sjo, pty, 'Copa Airlines', economica, 1, 140).
+vuelo(cm010, sjo, jfk, 'Copa Airlines', economica, 5, 390).
 
-<aeropuerto> ::= "aeropuerto(" <codigo_aeropuerto> "," <nombre_aeropuerto> ")"
+% Vuelos desde PTY
+vuelo(av011, pty, sjo, 'Avianca', economica, 1, 150).
+vuelo(av012, pty, jfk, 'Avianca', negocios, 6, 600).
+vuelo(av013, pty, phx, 'Avianca', economica, 6, 450).
+vuelo(av014, pty, lax, 'Avianca', economica, 7, 530).
+vuelo(av015, pty, sjo, 'Avianca', negocios, 1, 160).
+vuelo(av016, pty, jfk, 'Avianca', economica, 6, 480).
+vuelo(av017, pty, phx, 'Avianca', negocios, 6, 520).
+vuelo(av018, pty, lax, 'Avianca', economica, 7, 500).
+vuelo(av019, pty, sjo, 'Avianca', economica, 1, 135).
+vuelo(av020, pty, jfk, 'Avianca', economica, 6, 460).
 
-<codigo_aeropuerto> ::= "sjo" | "pty" | "jfk" | "phx" | "lax"
+% Vuelos desde JFK
+vuelo(aa021, jfk, sjo, 'American Airlines', economica, 5, 400).
+vuelo(aa022, jfk, pty, 'American Airlines', negocios, 6, 650).
+vuelo(aa023, jfk, phx, 'American Airlines', economica, 5, 430).
+vuelo(aa024, jfk, lax, 'American Airlines', economica, 6, 450).
+vuelo(aa025, jfk, sjo, 'American Airlines', negocios, 5, 420).
+vuelo(aa026, jfk, pty, 'American Airlines', economica, 6, 600).
+vuelo(aa027, jfk, phx, 'American Airlines', negocios, 5, 460).
+vuelo(aa028, jfk, lax, 'American Airlines', economica, 6, 470).
+vuelo(aa029, jfk, sjo, 'American Airlines', economica, 5, 395).
+vuelo(aa030, jfk, pty, 'American Airlines', economica, 6, 590).
 
-<nombre_aeropuerto> ::= "'San José, Costa Rica'"
-                     | "'Ciudad de Panamá, Panamá'"
-                     | "'New York, Estados Unidos'"
-                     | "'Phoenix, Arizona'"
-                     | "'Los Ángeles, California'"
+% Vuelos desde PHX
+vuelo(ua031, phx, sjo, 'United Airlines', economica, 6, 480).
+vuelo(ua032, phx, pty, 'United Airlines', negocios, 6, 550).
+vuelo(ua033, phx, jfk, 'United Airlines', economica, 5, 420).
+vuelo(ua034, phx, lax, 'United Airlines', economica, 1, 180).
+vuelo(ua035, phx, sjo, 'United Airlines', negocios, 6, 500).
+vuelo(ua036, phx, pty, 'United Airlines', economica, 6, 490).
+vuelo(ua037, phx, jfk, 'United Airlines', negocios, 5, 440).
+vuelo(ua038, phx, lax, 'United Airlines', economica, 1, 170).
+vuelo(ua039, phx, sjo, 'United Airlines', economica, 6, 470).
+vuelo(ua040, phx, pty, 'United Airlines', economica, 6, 530).
 
-<vuelos> ::= <vuelo> | <vuelo> <vuelos>
-
-<vuelo> ::= "vuelo(" <codigo> "," <origen> "," <destino> "," <aerolinea> "," <clase> "," <duracion> "," <precio> ")"
-
-<codigo> ::= "cm101" | "cm102" | "ua103" | "aa104" | "dl105" | "la106" | "ua107" | "cm108" | "aa109" | "dl110"
-           | "cm201" | "cm202" | "ua203" | "aa204" | "dl205" | "la206" | "ua207" | "cm208" | "aa209" | "dl210"
-           | "cm301" | "cm302" | "ua303" | "aa304" | "dl305" | "la306" | "ua307" | "cm308" | "aa309" | "dl310"
-           | "cm401" | "cm402" | "ua403" | "aa404" | "dl405" | "la406" | "ua407" | "cm408" | "aa409" | "dl410"
-           | "cm501" | "cm502" | "ua503" | "aa504" | "dl505" | "la506" | "ua507" | "cm508" | "aa509" | "dl510"
-
-<origen> ::= "sjo" | "pty" | "jfk" | "phx" | "lax"
-
-<destino> ::= "sjo" | "pty" | "jfk" | "phx" | "lax"
-
-<aerolinea> ::= "'Copa Airlines'" | "'United Airlines'" | "'American Airlines'" | "'Delta Airlines'" | "'LATAM Airlines'"
-
-<clase> ::= "economica" | "negocios"
-
-<duracion> ::= "1" | "5" | "6" | "7"
-
-<precio> ::= "200" | "210" | "220" | "240" | "250" | "300" | "310" | "400" | "410" | "420"
-           | "430" | "500" | "510" | "520" | "530" | "540" | "550" | "560" | "580" | "590"
-           | "600" | "610" | "620" | "640" | "650" | "660" | "670" | "680" | "690" | "700"
-           | "710" | "720" | "750"
+% Vuelos desde LAX
+vuelo(dl041, lax, sjo, 'Delta Airlines', economica, 7, 520).
+vuelo(dl042, lax, pty, 'Delta Airlines', negocios, 7, 640).
+vuelo(dl043, lax, jfk, 'Delta Airlines', economica, 6, 460).
+vuelo(dl044, lax, phx, 'Delta Airlines', economica, 1, 190).
+vuelo(dl045, lax, sjo, 'Delta Airlines', negocios, 7, 580).
+vuelo(dl046, lax, pty, 'Delta Airlines', economica, 7, 600).
+vuelo(dl047, lax, jfk, 'Delta Airlines', negocios, 6, 490).
+vuelo(dl048, lax, phx, 'Delta Airlines', economica, 1, 180).
+vuelo(dl049, lax, sjo, 'Delta Airlines', economica, 7, 510).
+vuelo(dl050, lax, pty, 'Delta Airlines', economica, 7, 620).
