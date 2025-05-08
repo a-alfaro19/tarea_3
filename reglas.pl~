@@ -136,7 +136,7 @@ tipo_vuelo(directo) --> [directo].
 tipo_vuelo(barato) --> [barato].
 
 % ----------------------------
-% Aerolíneas
+% Aerolíneas (sinónimos o variantes)
 % ----------------------------
 
 aerolinea_opc(copa_airlines) --> [copa, airlines].
@@ -150,7 +150,7 @@ aerolinea_opc(delta_airlines) --> [delta, airlines].
 aerolinea_opc(delta_airlines) --> [delta].
 
 % ----------------------------
-% Clase
+% Clase (sinónimos o variantes)
 % ----------------------------
 
 clase_opc(economica) --> [economica].

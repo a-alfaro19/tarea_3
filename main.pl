@@ -24,7 +24,6 @@ leer_toda_info(Origen, Destino, TipoVuelo, Aerolinea, Clase, Presupuesto) :-
         preguntar_tipo_vuelo(TipoVuelo0)
     ),
 
-    % El resto sigue normal
     preguntar_aerolinea(Aerolinea0),
     preguntar_clase(Clase0),
     preguntar_presupuesto(Presupuesto0),
@@ -48,16 +47,16 @@ preguntar_destino(Destino, Entrada) :-
 % ----------------------------
 % Dato normal (sin necesidad de la entrada después)
 preguntar_tipo_vuelo(TipoVuelo) :-
-    preguntar_dato('Excelente, ¿Desea un vuelo Chárter?', extraer_tipo_vuelo, TipoVuelo).
+    preguntar_dato('Excelente, ¿Desea un vuelo Chárter?', extraer_tipo_vuelo, TipoVuelo, true).
 
 preguntar_aerolinea(Aerolinea) :-
-    preguntar_dato('¿Tiene alguna Aerolínea de preferencia?', detectar_aerolinea_directo, Aerolinea).
+    preguntar_dato('¿Tiene alguna Aerolínea de preferencia?', detectar_aerolinea_directo, Aerolinea, false).
 
 preguntar_clase(Clase) :-
-    preguntar_dato('¿Tiene alguna clase preferencia (económica-negocios)?', extraer_clase, Clase).
+    preguntar_dato('¿Tiene alguna clase preferencia (económica-negocios)?', extraer_clase, Clase, false).
 
 preguntar_presupuesto(Presupuesto) :-
-    preguntar_dato('¿Tiene algún presupuesto?', extraer_presupuesto_num, Presupuesto).
+    preguntar_dato('¿Tiene algún presupuesto?', extraer_presupuesto_num, Presupuesto, false).
 
 % ----------------------------
 % Reutilizable: devuelve la entrada también
@@ -78,7 +77,7 @@ preguntar_dato_con_entrada(Prompt, ExtraerPred, Resultado, EntradaFinal) :-
     ).
 
 % Normal: solo devuelve el dato, no la entrada
-preguntar_dato(Prompt, ExtraerPred, Resultado) :-
+preguntar_dato(Prompt, ExtraerPred, Resultado, AceptarSiNo) :-
     writeln(Prompt),
     leer_oracion(Entrada),
     ( call(ExtraerPred, Entrada, Valor), Valor \= vacio ->
@@ -86,11 +85,14 @@ preguntar_dato(Prompt, ExtraerPred, Resultado) :-
     ; contiene_negacion(Entrada) ->
         Resultado = vacio
     ; contiene_afirmacion(Entrada) ->
-        Resultado = si
+        % Si dijo SÍ pero no dio info, volvemos a preguntar pero esta vez NO aceptamos solo sí/no
+        writeln('Perfecto, por favor indique el dato específico.'),
+        preguntar_dato(Prompt, ExtraerPred, Resultado, false)
     ; writeln('No entendí, ¿podría repetir?'),
-      preguntar_dato(Prompt, ExtraerPred, Resultado)
+      preguntar_dato(Prompt, ExtraerPred, Resultado, AceptarSiNo)
     ).
 
+%
 % ----------------------------
 % Leer oración y limpiar
 leer_oracion(Limpias) :-
@@ -150,4 +152,4 @@ detectar_aerolinea_directo(Entrada, Aerolinea) :-
 % ----------------------------
 % Negación / afirmación para control de flujo
 contiene_negacion(Entrada) :- member(N, Entrada), member(N, [no, nunca, jamas, negativo]).
-contiene_afirmacion(Entrada) :- member(S, Entrada), member(S, [si, claro, afirmativo, correcto, obviamente]).
+contiene_afirmacion(Entrada) :- member(S, Entrada), member(S, [si, sí, claro, afirmativo, correcto, obviamente]).

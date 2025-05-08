@@ -125,6 +125,8 @@ lugar(lax) --> [lax].
 lugar(lax) --> [los, angeles].
 lugar(lax) --> [los, angeles, california].
 lugar(lax) --> [california].
+lugar(lax) --> [los,ángeles].
+
 
 % ----------------------------
 % Tipo de vuelo

@@ -19,12 +19,11 @@ leer_toda_info(Origen, Destino, TipoVuelo, Aerolinea, Clase, Presupuesto) :-
     % Intentamos detectar el tipo de vuelo desde la frase del destino
     ( extraer_tipo_vuelo(EntradaDestino, TipoV0), TipoV0 \= vacio ->
         TipoVuelo0 = TipoV0,
-        format('Usted ha seleccionado un vuelo: ~w~n', [TipoVuelo0])
+        format('Ha seleccionado un vuelo: ~w~n', [TipoVuelo0])
     ;
         preguntar_tipo_vuelo(TipoVuelo0)
     ),
 
-    % El resto sigue normal
     preguntar_aerolinea(Aerolinea0),
     preguntar_clase(Clase0),
     preguntar_presupuesto(Presupuesto0),
@@ -78,19 +77,18 @@ preguntar_dato_con_entrada(Prompt, ExtraerPred, Resultado, EntradaFinal) :-
     ).
 
 % Normal: solo devuelve el dato, no la entrada
-preguntar_dato(Prompt, ExtraerPred, Resultado) :-
+preguntar_dato(Prompt, ExtraerPred, Resultado, AceptarSiNo) :-
     writeln(Prompt),
     leer_oracion(Entrada),
     ( call(ExtraerPred, Entrada, Valor), Valor \= vacio ->
         Resultado = Valor
-    ; contiene_negacion(Entrada) ->
+    ; (AceptarSiNo == true, contiene_negacion(Entrada)) ->
         Resultado = vacio
-    ; contiene_afirmacion(Entrada) ->
+    ; (AceptarSiNo == true, contiene_afirmacion(Entrada)) ->
         Resultado = si
     ; writeln('No entendí, ¿podría repetir?'),
-      preguntar_dato(Prompt, ExtraerPred, Resultado)
+      preguntar_dato(Prompt, ExtraerPred, Resultado, AceptarSiNo)
     ).
-
 % ----------------------------
 % Leer oración y limpiar
 leer_oracion(Limpias) :-
@@ -150,4 +148,4 @@ detectar_aerolinea_directo(Entrada, Aerolinea) :-
 % ----------------------------
 % Negación / afirmación para control de flujo
 contiene_negacion(Entrada) :- member(N, Entrada), member(N, [no, nunca, jamas, negativo]).
-contiene_afirmacion(Entrada) :- member(S, Entrada), member(S, [si, claro, afirmativo, correcto, obviamente]).
+contiene_afirmacion(Entrada) :- member(S, Entrada), member(S, [si, sí, claro, afirmativo, correcto, obviamente]).
