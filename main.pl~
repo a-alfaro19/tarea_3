@@ -11,10 +11,15 @@ leer_toda_info(Origen, Destino, TipoVuelo, Aerolinea, Clase, Presupuesto) :-
     preguntar_origen(Origen0,_),
     preguntar_destino(Destino0, EntradaDestino),
 
+    % Aquí detectamos el sintagma verbal
+    ( phrase(sintagma_verbal(_Intencion), EntradaDestino) ->
+        true
+    ; true
+    ),
     % Intentamos detectar el tipo de vuelo desde la frase del destino
     ( extraer_tipo_vuelo(EntradaDestino, TipoV0), TipoV0 \= vacio ->
         TipoVuelo0 = TipoV0,
-        format('Tipo de vuelo detectado previamente: ~w~n', [TipoVuelo0])
+        format('Usted ha seleccionado un vuelo: ~w~n', [TipoVuelo0])
     ;
         preguntar_tipo_vuelo(TipoVuelo0)
     ),

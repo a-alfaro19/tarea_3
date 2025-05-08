@@ -65,6 +65,6 @@ vuelo(dl048, lax, phx, 'Delta Airlines', economica, 1, 180).
 vuelo(dl049, lax, sjo, 'Delta Airlines', economica, 7, 510).
 vuelo(dl050, lax, pty, 'Delta Airlines', economica, 7, 620).
 
-% Definir arco como un alias de vuelo (para usarlo como grafo)
+% Definir arco como un alias de vuelo
 arco(Codigo, Origen, Destino, Aerolinea, Clase, Tiempo, Costo) :-
     vuelo(Codigo, Origen, Destino, Aerolinea, Clase, Tiempo, Costo).
