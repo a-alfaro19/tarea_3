@@ -9,7 +9,7 @@ iniciar :-
 
 leer_toda_info(Origen, Destino, TipoVuelo, Aerolinea, Clase, Presupuesto) :-
     preguntar_origen(Origen0,_),
-    preguntar_destino(Destino0, EntradaDestino),
+    preguntar_destino_valido(Origen0, Destino0, EntradaDestino),
 
     % Aquí detectamos el sintagma verbal
     ( phrase(sintagma_verbal(_Intencion), EntradaDestino) ->
@@ -28,6 +28,7 @@ leer_toda_info(Origen, Destino, TipoVuelo, Aerolinea, Clase, Presupuesto) :-
     preguntar_clase(Clase0),
     preguntar_presupuesto(Presupuesto0),
 
+
     % Asignamos los resultados
     Origen = Origen0,
     Destino = Destino0,
@@ -38,11 +39,34 @@ leer_toda_info(Origen, Destino, TipoVuelo, Aerolinea, Clase, Presupuesto) :-
 
 % ----------------------------
 % Lectura con retorno de la entrada original
+
 preguntar_origen(Origen, Entrada) :-
-    preguntar_dato_con_entrada('Por favor indíqueme cuál es el origen de su vuelo.', extraer_origen, Origen, Entrada).
+    preguntar_lugar('Por favor indíqueme cuál es el origen de su vuelo.', extraer_origen, Origen, Entrada).
 
 preguntar_destino(Destino, Entrada) :-
-    preguntar_dato_con_entrada('Muy bien, ¿Cuál es su destino?', extraer_destino, Destino, Entrada).
+    preguntar_lugar('Muy bien, ¿Cuál es su destino?', extraer_destino, Destino, Entrada).
+
+preguntar_destino_valido(Origen, Destino, EntradaDestino) :-
+    preguntar_destino(Destino0, Entrada),
+    ( Destino0 = Origen ->
+        writeln('Error: El destino no puede ser el mismo que el origen. Por favor, indique otro destino.'),
+        preguntar_destino_valido(Origen, Destino, EntradaDestino)
+    ;
+        Destino = Destino0,
+        EntradaDestino = Entrada
+    ).
+
+preguntar_lugar(Prompt, ExtraerPred, Lugar, EntradaFinal) :-
+    writeln(Prompt),
+    leer_oracion(Entrada),
+    ( call(ExtraerPred, Entrada, Valor), Valor \= vacio ->
+        Lugar = Valor,
+        EntradaFinal = Entrada
+    ;
+        writeln('No entendí, ¿podría repetir?'),
+        preguntar_lugar(Prompt, ExtraerPred, Lugar, EntradaFinal)
+    ).
+
 
 % ----------------------------
 % Dato normal (sin necesidad de la entrada después)
@@ -85,9 +109,12 @@ preguntar_dato(Prompt, ExtraerPred, Resultado, AceptarSiNo) :-
     ; contiene_negacion(Entrada) ->
         Resultado = vacio
     ; contiene_afirmacion(Entrada) ->
-        % Si dijo SÍ pero no dio info, volvemos a preguntar pero esta vez NO aceptamos solo sí/no
-        writeln('Perfecto, por favor indique el dato específico.'),
-        preguntar_dato(Prompt, ExtraerPred, Resultado, false)
+        ( AceptarSiNo == true ->
+            Resultado = si
+        ;
+            writeln('Perfecto, por favor indique el dato específico.'),
+            preguntar_dato(Prompt, ExtraerPred, Resultado, false)
+        )
     ; writeln('No entendí, ¿podría repetir?'),
       preguntar_dato(Prompt, ExtraerPred, Resultado, AceptarSiNo)
     ).
@@ -113,7 +140,13 @@ es_puntuacion(C) :- member(C, ['.', ',', ';', ':', '!', '?']).
 % Extractores individuales
 extraer_origen(Entrada, O) :- extraer(origen, Entrada, O).
 extraer_destino(Entrada, D) :- extraer(destino, Entrada, D).
-extraer_tipo_vuelo(Entrada, T) :- extraer(tipo_vuelo, Entrada, T).
+extraer_tipo_vuelo(Entrada, Tipo) :-
+    ( contiene_afirmacion(Entrada) ->
+        Tipo = charter
+    ; contiene_negacion(Entrada) ->
+        Tipo = vacio
+    ; extraer(tipo_vuelo, Entrada, Tipo)
+    ).
 extraer_clase(Entrada, C) :- extraer(clase, Entrada, C).
 extraer_presupuesto_num(Entrada, N) :- extraer_presupuesto_numero(Entrada, N).
 

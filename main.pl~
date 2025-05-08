@@ -9,7 +9,7 @@ iniciar :-
 
 leer_toda_info(Origen, Destino, TipoVuelo, Aerolinea, Clase, Presupuesto) :-
     preguntar_origen(Origen0,_),
-    preguntar_destino(Destino0, EntradaDestino),
+    preguntar_destino_valido(Origen0, Destino0, EntradaDestino),
 
     % Aquí detectamos el sintagma verbal
     ( phrase(sintagma_verbal(_Intencion), EntradaDestino) ->
@@ -28,6 +28,7 @@ leer_toda_info(Origen, Destino, TipoVuelo, Aerolinea, Clase, Presupuesto) :-
     preguntar_clase(Clase0),
     preguntar_presupuesto(Presupuesto0),
 
+
     % Asignamos los resultados
     Origen = Origen0,
     Destino = Destino0,
@@ -44,19 +45,29 @@ preguntar_origen(Origen, Entrada) :-
 preguntar_destino(Destino, Entrada) :-
     preguntar_dato_con_entrada('Muy bien, ¿Cuál es su destino?', extraer_destino, Destino, Entrada).
 
+preguntar_destino_valido(Origen, Destino, EntradaDestino) :-
+    preguntar_destino(Destino0, Entrada),
+    ( Destino0 = Origen ->
+        writeln('Error: El destino no puede ser el mismo que el origen. Por favor, indique otro destino.'),
+        preguntar_destino_valido(Origen, Destino, EntradaDestino)
+    ;
+        Destino = Destino0,
+        EntradaDestino = Entrada
+    ).
+
 % ----------------------------
 % Dato normal (sin necesidad de la entrada después)
 preguntar_tipo_vuelo(TipoVuelo) :-
-    preguntar_dato('Excelente, ¿Desea un vuelo Chárter?', extraer_tipo_vuelo, TipoVuelo).
+    preguntar_dato('Excelente, ¿Desea un vuelo Chárter?', extraer_tipo_vuelo, TipoVuelo, true).
 
 preguntar_aerolinea(Aerolinea) :-
-    preguntar_dato('¿Tiene alguna Aerolínea de preferencia?', detectar_aerolinea_directo, Aerolinea).
+    preguntar_dato('¿Tiene alguna Aerolínea de preferencia?', detectar_aerolinea_directo, Aerolinea, false).
 
 preguntar_clase(Clase) :-
-    preguntar_dato('¿Tiene alguna clase preferencia (económica-negocios)?', extraer_clase, Clase).
+    preguntar_dato('¿Tiene alguna clase preferencia (económica-negocios)?', extraer_clase, Clase, false).
 
 preguntar_presupuesto(Presupuesto) :-
-    preguntar_dato('¿Tiene algún presupuesto?', extraer_presupuesto_num, Presupuesto).
+    preguntar_dato('¿Tiene algún presupuesto?', extraer_presupuesto_num, Presupuesto, false).
 
 % ----------------------------
 % Reutilizable: devuelve la entrada también
@@ -82,13 +93,20 @@ preguntar_dato(Prompt, ExtraerPred, Resultado, AceptarSiNo) :-
     leer_oracion(Entrada),
     ( call(ExtraerPred, Entrada, Valor), Valor \= vacio ->
         Resultado = Valor
-    ; (AceptarSiNo == true, contiene_negacion(Entrada)) ->
+    ; contiene_negacion(Entrada) ->
         Resultado = vacio
-    ; (AceptarSiNo == true, contiene_afirmacion(Entrada)) ->
-        Resultado = si
+    ; contiene_afirmacion(Entrada) ->
+        ( AceptarSiNo == true ->
+            Resultado = si
+        ;
+            writeln('Perfecto, por favor indique el dato específico.'),
+            preguntar_dato(Prompt, ExtraerPred, Resultado, false)
+        )
     ; writeln('No entendí, ¿podría repetir?'),
       preguntar_dato(Prompt, ExtraerPred, Resultado, AceptarSiNo)
     ).
+
+%
 % ----------------------------
 % Leer oración y limpiar
 leer_oracion(Limpias) :-
@@ -109,7 +127,13 @@ es_puntuacion(C) :- member(C, ['.', ',', ';', ':', '!', '?']).
 % Extractores individuales
 extraer_origen(Entrada, O) :- extraer(origen, Entrada, O).
 extraer_destino(Entrada, D) :- extraer(destino, Entrada, D).
-extraer_tipo_vuelo(Entrada, T) :- extraer(tipo_vuelo, Entrada, T).
+extraer_tipo_vuelo(Entrada, Tipo) :-
+    ( contiene_afirmacion(Entrada) ->
+        Tipo = charter
+    ; contiene_negacion(Entrada) ->
+        Tipo = vacio
+    ; extraer(tipo_vuelo, Entrada, Tipo)
+    ).
 extraer_clase(Entrada, C) :- extraer(clase, Entrada, C).
 extraer_presupuesto_num(Entrada, N) :- extraer_presupuesto_numero(Entrada, N).
 

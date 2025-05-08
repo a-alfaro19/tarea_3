@@ -1,5 +1,8 @@
 :- discontiguous sintagma_nominal/6.
 
+% Lugar puro: solo acepta si la frase ES el lugar, sin nada más
+lugar_puro(Origen) --> lugar(Origen).
+
 % ----------------------------
 % Sintagma nominal para ORIGEN
 % ----------------------------
@@ -7,14 +10,14 @@
 sintagma_nominal(origen(Origen), vacio, vacio, vacio, vacio, vacio) -->
     skip, [estoy, en], skip, lugar(Origen), skip.
 sintagma_nominal(origen(Origen), vacio, vacio, vacio, vacio, vacio) -->
-    skip, lugar(Origen), skip.
+    lugar_puro(Origen).
 sintagma_nominal(origen(Origen), vacio, vacio, vacio, vacio, vacio) -->
     skip, [salgo, de], skip, lugar(Origen), skip.
 
 % ----------------------------
 % Sintagma nominal para DESTINO
 % ----------------------------
-
+%
 sintagma_nominal(vacio, destino(Destino), vacio, vacio, vacio, vacio) -->
     skip, [quiero, viajar, a], skip, lugar(Destino), skip.
 sintagma_nominal(vacio, destino(Destino), vacio, vacio, vacio, vacio) -->
@@ -25,8 +28,11 @@ sintagma_nominal(vacio, destino(Destino), vacio, vacio, vacio, vacio) -->
     skip, [me, gustaria, ir, a], skip, lugar(Destino), skip.
 sintagma_nominal(vacio, destino(Destino), vacio, vacio, vacio, vacio) -->
     skip, [ir, a], skip, lugar(Destino), skip.
+
+% SOLO esta para frases puras:
 sintagma_nominal(vacio, destino(Destino), vacio, vacio, vacio, vacio) -->
-    skip, lugar(Destino), skip.
+    lugar_puro(Destino).
+
 
 % ----------------------------
 % Sintagma nominal para TIPO DE VUELO
@@ -79,6 +85,10 @@ sintagma_verbal(deseo_viajar) -->
 sintagma_verbal(deseo_viajar) -->
     skip, [planeo, ir], skip.
 sintagma_verbal(deseo_viajar) -->
+    skip, [quiero, ir], skip.
+sintagma_verbal(deseo_viajar) -->
+    skip, [quiero, viajar], skip.
+sintagma_verbal(deseo_viajar) -->
     skip, [necesito, viajar], skip.
 sintagma_verbal(deseo_viajar) -->
     skip, [quisiera, viajar], skip.
@@ -105,8 +115,14 @@ lugar(sjo) --> [costa, rica].
 % PTY - Ciudad de Panama, Panama
 lugar(pty) --> [pty].
 lugar(pty) --> [panama].
+lugar(pty) --> [panamá].
+
 lugar(pty) --> [ciudad, de, panama].
+lugar(pty) --> [ciudad, de, panamá].
+
 lugar(pty) --> [ciudad, de, panama, panama].
+lugar(pty) --> [ciudad, de, panamá, panamá].
+
 
 % JFK - New York, Estados Unidos
 lugar(jfk) --> [jfk].
