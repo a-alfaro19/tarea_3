@@ -1,0 +1,148 @@
+:- consult('reglas.pl').
+:- consult('motor.pl').
+:- consult('base_de_datos.pl').
+
+iniciar :-
+    writeln('Bienvenido a TravelAgencyLog la mejor lógica de llegar a su destino.'),
+    leer_toda_info(Origen, Destino, TipoVuelo, Aerolinea, Clase, Presupuesto),
+    buscar_y_mostrar(Origen, Destino, TipoVuelo, Aerolinea, Clase, Presupuesto).
+
+leer_toda_info(Origen, Destino, TipoVuelo, Aerolinea, Clase, Presupuesto) :-
+    preguntar_origen(Origen0,_),
+    preguntar_destino(Destino0, EntradaDestino),
+
+    % Intentamos detectar el tipo de vuelo desde la frase del destino
+    ( extraer_tipo_vuelo(EntradaDestino, TipoV0), TipoV0 \= vacio ->
+        TipoVuelo0 = TipoV0,
+        format('Tipo de vuelo detectado: ~w~n', [TipoVuelo0])
+    ;
+        preguntar_tipo_vuelo(TipoVuelo0)
+    ),
+
+    % El resto sigue normal
+    preguntar_aerolinea(Aerolinea0),
+    preguntar_clase(Clase0),
+    preguntar_presupuesto(Presupuesto0),
+
+    % Asignamos los resultados
+    Origen = Origen0,
+    Destino = Destino0,
+    TipoVuelo = TipoVuelo0,
+    Aerolinea = Aerolinea0,
+    Clase = Clase0,
+    Presupuesto = Presupuesto0.
+
+% ----------------------------
+% Lectura con retorno de la entrada original
+preguntar_origen(Origen, Entrada) :-
+    preguntar_dato_con_entrada('Por favor indíqueme cuál es el origen de su vuelo.', extraer_origen, Origen, Entrada).
+
+preguntar_destino(Destino, Entrada) :-
+    preguntar_dato_con_entrada('Muy bien, ¿Cuál es su destino?', extraer_destino, Destino, Entrada).
+
+% ----------------------------
+% Dato normal (sin necesidad de la entrada después)
+preguntar_tipo_vuelo(TipoVuelo) :-
+    preguntar_dato('Excelente, ¿Desea un vuelo Chárter?', extraer_tipo_vuelo, TipoVuelo).
+
+preguntar_aerolinea(Aerolinea) :-
+    preguntar_dato('¿Tiene alguna Aerolínea de preferencia?', detectar_aerolinea_directo, Aerolinea).
+
+preguntar_clase(Clase) :-
+    preguntar_dato('¿Tiene alguna clase preferencia (económica-negocios)?', extraer_clase, Clase).
+
+preguntar_presupuesto(Presupuesto) :-
+    preguntar_dato('¿Tiene algún presupuesto?', extraer_presupuesto_num, Presupuesto).
+
+% ----------------------------
+% Reutilizable: devuelve la entrada también
+preguntar_dato_con_entrada(Prompt, ExtraerPred, Resultado, EntradaFinal) :-
+    writeln(Prompt),
+    leer_oracion(Entrada),
+    ( call(ExtraerPred, Entrada, Valor), Valor \= vacio ->
+        Resultado = Valor,
+        EntradaFinal = Entrada
+    ; contiene_negacion(Entrada) ->
+        Resultado = vacio,
+        EntradaFinal = Entrada
+    ; contiene_afirmacion(Entrada) ->
+        Resultado = si,
+        EntradaFinal = Entrada
+    ; writeln('No entendí, ¿podría repetir?'),
+      preguntar_dato_con_entrada(Prompt, ExtraerPred, Resultado, EntradaFinal)
+    ).
+
+% Normal: solo devuelve el dato, no la entrada
+preguntar_dato(Prompt, ExtraerPred, Resultado) :-
+    writeln(Prompt),
+    leer_oracion(Entrada),
+    ( call(ExtraerPred, Entrada, Valor), Valor \= vacio ->
+        Resultado = Valor
+    ; contiene_negacion(Entrada) ->
+        Resultado = vacio
+    ; contiene_afirmacion(Entrada) ->
+        Resultado = si
+    ; writeln('No entendí, ¿podría repetir?'),
+      preguntar_dato(Prompt, ExtraerPred, Resultado)
+    ).
+
+% ----------------------------
+% Leer oración y limpiar
+leer_oracion(Limpias) :-
+    read_line_to_codes(user_input, Codes),
+    atom_codes(Atom, Codes),
+    atomic_list_concat(Atoms, ' ', Atom),
+    maplist(downcase_atom, Atoms, Lowers),
+    maplist(limpiar_palabra, Lowers, Limpias).
+
+limpiar_palabra(Original, Limpia) :-
+    atom_chars(Original, Chars),
+    exclude(es_puntuacion, Chars, LimpiasChars),
+    atom_chars(Limpia, LimpiasChars).
+
+es_puntuacion(C) :- member(C, ['.', ',', ';', ':', '!', '?']).
+
+% ----------------------------
+% Extractores individuales
+extraer_origen(Entrada, O) :- extraer(origen, Entrada, O).
+extraer_destino(Entrada, D) :- extraer(destino, Entrada, D).
+extraer_tipo_vuelo(Entrada, T) :- extraer(tipo_vuelo, Entrada, T).
+extraer_clase(Entrada, C) :- extraer(clase, Entrada, C).
+extraer_presupuesto_num(Entrada, N) :- extraer_presupuesto_numero(Entrada, N).
+
+% ----------------------------
+% Extractor genérico usando sintagma_nominal
+extraer(origen, Entrada, O) :-
+    ( phrase(sintagma_nominal(origen(O), _, _, _, _, _), Entrada) -> true ; O = vacio ).
+extraer(destino, Entrada, D) :-
+    ( phrase(sintagma_nominal(_, destino(D), _, _, _, _), Entrada) -> true ; D = vacio ).
+extraer(tipo_vuelo, Entrada, T) :-
+    ( phrase(sintagma_nominal(_, _, tipo_vuelo(T), _, _, _), Entrada) -> true ; T = vacio ).
+extraer(clase, Entrada, C) :-
+    ( phrase(sintagma_nominal(_, _, _, _, clase(C), _), Entrada) -> true ; C = vacio ).
+
+% ----------------------------
+% Extraer presupuesto numérico desde cualquier parte
+extraer_presupuesto_numero(Entrada, Numero) :-
+    include(atom_number_safe, Entrada, Numeros),
+    ( Numeros = [NAtom|_] ->
+        atom_number(NAtom, Numero)
+    ; Numero = vacio
+    ).
+atom_number_safe(Atom) :- catch(atom_number(Atom, _), _, fail).
+
+% ----------------------------
+% Aerolínea directa
+detectar_aerolinea_directo(Entrada, Aerolinea) :-
+    ( member(united, Entrada), member(airlines, Entrada) -> Aerolinea = united_airlines
+    ; member(copa, Entrada), member(airlines, Entrada) -> Aerolinea = copa_airlines
+    ; member(avianca, Entrada) -> Aerolinea = avianca
+    ; member(american, Entrada), member(airlines, Entrada) -> Aerolinea = american_airlines
+    ; member(delta, Entrada), member(airlines, Entrada) -> Aerolinea = delta_airlines
+    ; Aerolinea = vacio
+    ).
+
+% ----------------------------
+% Negación / afirmación para control de flujo
+contiene_negacion(Entrada) :- member(N, Entrada), member(N, [no, nunca, jamas, negativo]).
+contiene_afirmacion(Entrada) :- member(S, Entrada), member(S, [si, claro, afirmativo, correcto, obviamente]).

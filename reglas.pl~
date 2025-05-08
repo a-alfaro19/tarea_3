@@ -111,7 +111,6 @@ aerolinea_opc(delta_airlines) --> [delta, airlines].
 % ----------------------------
 
 clase_opc(economica) --> [economica].
-clase_opc(economica) --> [económica].
 clase_opc(negocios) --> [negocios].
 
 % ----------------------------
