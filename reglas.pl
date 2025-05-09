@@ -30,6 +30,11 @@ sintagma_nominal(vacio, destino(Destino), vacio, vacio, vacio, vacio) -->
 sintagma_nominal(vacio, destino(Destino), vacio, vacio, vacio, vacio) -->
     skip, [me, gustaria, viajar, a], skip, lugar(Destino), skip.
 sintagma_nominal(vacio, destino(Destino), vacio, vacio, vacio, vacio) -->
+    skip, [me, gustaría, ir, a], skip, lugar(Destino), skip.
+sintagma_nominal(vacio, destino(Destino), vacio, vacio, vacio, vacio) -->
+    skip, [me, gustaría, viajar, a], skip, lugar(Destino), skip.
+
+sintagma_nominal(vacio, destino(Destino), vacio, vacio, vacio, vacio) -->
     skip, [deseo, viajar, a], skip, lugar(Destino), skip.
 
 sintagma_nominal(vacio, destino(Destino), vacio, vacio, vacio, vacio) -->
@@ -236,6 +241,7 @@ lugar(lax) --> [los,ángeles].
 % ----------------------------
 
 tipo_vuelo(charter) --> [charter].
+tipo_vuelo(charter) --> [chárter].
 tipo_vuelo(comercial) --> [comercial].
 tipo_vuelo(directo) --> [directo].
 tipo_vuelo(barato) --> [barato].

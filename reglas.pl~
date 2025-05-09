@@ -28,6 +28,11 @@ sintagma_nominal(vacio, destino(Destino), vacio, vacio, vacio, vacio) -->
 sintagma_nominal(vacio, destino(Destino), vacio, vacio, vacio, vacio) -->
     skip, [me, gustaria, ir, a], skip, lugar(Destino), skip.
 sintagma_nominal(vacio, destino(Destino), vacio, vacio, vacio, vacio) -->
+    skip, [me, gustaria, viajar, a], skip, lugar(Destino), skip.
+sintagma_nominal(vacio, destino(Destino), vacio, vacio, vacio, vacio) -->
+    skip, [deseo, viajar, a], skip, lugar(Destino), skip.
+
+sintagma_nominal(vacio, destino(Destino), vacio, vacio, vacio, vacio) -->
     skip, [quiero, ir, a], skip, lugar(Destino), skip.
 
 sintagma_nominal(vacio, destino(Destino), vacio, vacio, vacio, vacio) -->
