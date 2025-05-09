@@ -273,8 +273,9 @@ presupuesto_opc(Monto) --> [Monto], { number(Monto) }.
 % Validar si la oración tiene un sintagma verbal
 % ----------------------------
 oracion_valida(Entrada) :-
-    phrase(sintagma_verbal(_Verbo), Entrada).
-
+    ( phrase(sintagma_verbal(_Verbo), Entrada)
+    ; phrase(sintagma_nominal(_, destino(_), _, _, _, _), Entrada)
+    ).
 % ----------------------------
 % Skip: permite saltar cualquier palabra innecesaria antes/después
 % ----------------------------
