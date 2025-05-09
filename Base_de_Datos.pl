@@ -1,3 +1,4 @@
+%Definición de hechos
 % Aeropuertos
 aeropuerto(sjo, 'San Jose, Costa Rica').
 aeropuerto(pty, 'Ciudad de Panama, Panama').

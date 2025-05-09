@@ -2,20 +2,11 @@
 :- consult('motor.pl').
 :- consult('base_de_datos.pl').
 
-% ----------------------------
-% iniciar/0
-% Inicia el sistema TravelAgencyLog y gestiona toda la interacción con el usuario.
-% ----------------------------
 iniciar :-
     writeln('Bienvenido a TravelAgencyLog la mejor lógica de llegar a su destino.'),
     leer_toda_info(Origen, Destino, TipoVuelo, Aerolinea, Clase, Presupuesto),
     buscar_y_mostrar(Origen, Destino, TipoVuelo, Aerolinea, Clase, Presupuesto).
 
-% ----------------------------
-% leer_toda_info/6
-% Lee todos los datos necesarios del usuario (origen, destino, tipo de vuelo, aerolínea, clase y presupuesto),
-% asegurando que las entradas son válidas.
-% ----------------------------
 leer_toda_info(Origen, Destino, TipoVuelo, Aerolinea, Clase, Presupuesto) :-
     preguntar_origen(Origen0,_),
     preguntar_destino_valido(Origen0, Destino0, EntradaDestino),
@@ -45,24 +36,14 @@ leer_toda_info(Origen, Destino, TipoVuelo, Aerolinea, Clase, Presupuesto) :-
     Presupuesto = Presupuesto0.
 
 % ----------------------------
-% preguntar_origen/2
-% Pregunta al usuario el origen del vuelo y devuelve la entrada limpia.
-% ----------------------------
+% Lectura con retorno de la entrada original
+
 preguntar_origen(Origen, Entrada) :-
     preguntar_lugar('Por favor indíqueme cuál es el origen de su vuelo.', extraer_origen, Origen, Entrada).
 
-
-% ----------------------------
-% preguntar_destino/2
-% Pregunta al usuario el destino del vuelo y devuelve la entrada limpia.
-% ----------------------------
 preguntar_destino(Destino, Entrada) :-
     preguntar_lugar('Muy bien, ¿Cuál es su destino?', extraer_destino, Destino, Entrada).
 
-% ----------------------------
-% preguntar_destino_valido/3
-% Pregunta el destino y valida que no sea igual al origen.
-% ----------------------------
 preguntar_destino_valido(Origen, Destino, EntradaDestino) :-
     preguntar_destino(Destino0, Entrada),
     ( Destino0 = Origen ->
@@ -73,10 +54,6 @@ preguntar_destino_valido(Origen, Destino, EntradaDestino) :-
         EntradaDestino = Entrada
     ).
 
-% ----------------------------
-% preguntar_lugar/4
-% Pregunta un lugar (origen o destino) y devuelve tanto el valor como la entrada procesada.
-% ----------------------------
 preguntar_lugar(Prompt, ExtraerPred, Lugar, EntradaFinal) :-
     writeln(Prompt),
     leer_oracion(Entrada),
@@ -88,32 +65,18 @@ preguntar_lugar(Prompt, ExtraerPred, Lugar, EntradaFinal) :-
         preguntar_lugar(Prompt, ExtraerPred, Lugar, EntradaFinal)
     ).
 
-% ----------------------------
-% preguntar_tipo_vuelo/1
-% Pregunta el tipo de vuelo deseado por el usuario.
-% ----------------------------
 
+% ----------------------------
+% Dato normal (sin necesidad de la entrada después)
 preguntar_tipo_vuelo(TipoVuelo) :-
     preguntar_dato('Excelente, ¿Desea un vuelo Chárter?', extraer_tipo_vuelo, TipoVuelo, true).
 
-% ----------------------------
-% preguntar_aerolinea/1
-% Pregunta si el usuario tiene una aerolínea preferida.
-% ----------------------------
 preguntar_aerolinea(Aerolinea) :-
     preguntar_dato('¿Tiene alguna Aerolínea de preferencia?', detectar_aerolinea_directo, Aerolinea, false).
 
-% ----------------------------
-% preguntar_clase/1
-% Pregunta la clase de vuelo preferida.
-% ----------------------------
 preguntar_clase(Clase) :-
     preguntar_dato('¿Tiene alguna clase preferencia (económica-negocios)?', extraer_clase, Clase, false).
 
-% ----------------------------
-% preguntar_presupuesto/1
-% Pregunta por el presupuesto y detecta frases como 'no tengo dinero' o un monto específico.
-% ----------------------------
 preguntar_presupuesto(Presupuesto) :-
     writeln('¿Tiene algún presupuesto?'),
     leer_oracion(Entrada),
@@ -130,9 +93,7 @@ preguntar_presupuesto(Presupuesto) :-
     ).
 
 % ----------------------------
-% preguntar_dato_con_entrada/4
-% Pregunta un dato, devuelve tanto el valor como la entrada completa.
-% ----------------------------
+% Reutilizable: devuelve la entrada también
 preguntar_dato_con_entrada(Prompt, ExtraerPred, Resultado, EntradaFinal) :-
     writeln(Prompt),
     leer_oracion(Entrada),
@@ -149,10 +110,7 @@ preguntar_dato_con_entrada(Prompt, ExtraerPred, Resultado, EntradaFinal) :-
       preguntar_dato_con_entrada(Prompt, ExtraerPred, Resultado, EntradaFinal)
     ).
 
-% ----------------------------
-% preguntar_dato/4
-% Pregunta un dato, solo devuelve el valor.
-% ----------------------------
+% Normal: solo devuelve el dato, no la entrada
 preguntar_dato(Prompt, ExtraerPred, Resultado, AceptarSiNo) :-
     writeln(Prompt),
     leer_oracion(Entrada),
@@ -171,10 +129,9 @@ preguntar_dato(Prompt, ExtraerPred, Resultado, AceptarSiNo) :-
       preguntar_dato(Prompt, ExtraerPred, Resultado, AceptarSiNo)
     ).
 
+%
 % ----------------------------
-% leer_oracion/1
-% Lee una oración desde la entrada estándar y la devuelve como lista de átomos limpia.
-% ----------------------------
+% Leer oración y limpiar
 leer_oracion(Limpias) :-
     read_line_to_codes(user_input, Codes),
     atom_codes(Atom, Codes),
@@ -182,24 +139,15 @@ leer_oracion(Limpias) :-
     maplist(downcase_atom, Atoms, Lowers),
     maplist(limpiar_palabra, Lowers, Limpias).
 
-% ----------------------------
-% limpiar_palabra/2
-% Limpia signos de puntuación de una palabra.
-% ----------------------------
 limpiar_palabra(Original, Limpia) :-
     atom_chars(Original, Chars),
     exclude(es_puntuacion, Chars, LimpiasChars),
     atom_chars(Limpia, LimpiasChars).
 
-% ----------------------------
-% es_puntuacion/1
-% Verifica si un carácter es signo de puntuación.
-% ----------------------------
 es_puntuacion(C) :- member(C, ['.', ',', ';', ':', '!', '?']).
 
 % ----------------------------
-% Extraer funciones (detectan elementos en la entrada)
-% ----------------------------
+% Extractores individuales
 extraer_origen(Entrada, O) :- extraer(origen, Entrada, O).
 extraer_destino(Entrada, D) :- extraer(destino, Entrada, D).
 extraer_tipo_vuelo(Entrada, Tipo) :-
@@ -211,19 +159,13 @@ extraer_tipo_vuelo(Entrada, Tipo) :-
     ).
 extraer_clase(Entrada, C) :- extraer(clase, Entrada, C).
 
-% ----------------------------
-% extraer_presupuesto_num/2
-% Detecta si el usuario dice que no tiene dinero o extrae el monto.
-% ----------------------------
 extraer_presupuesto_num(Entrada, 0) :-
     contiene_sin_plata(Entrada), !.
 extraer_presupuesto_num(Entrada, N) :-
     extraer_presupuesto_numero(Entrada, N).
 
 % ----------------------------
-% extraer/3
-% Extrae cualquier elemento usando sintagma_nominal.
-% ----------------------------
+% Extractor genérico usando sintagma_nominal
 extraer(origen, Entrada, O) :-
     ( phrase(sintagma_nominal(origen(O), _, _, _, _, _), Entrada) -> true ; O = vacio ).
 extraer(destino, Entrada, D) :-
@@ -234,26 +176,17 @@ extraer(clase, Entrada, C) :-
     ( phrase(sintagma_nominal(_, _, _, _, clase(C), _), Entrada) -> true ; C = vacio ).
 
 % ----------------------------
-% extraer_presupuesto_numero/2
-% Busca números en la entrada y los convierte en número.
-% ----------------------------
+% Extraer presupuesto numérico desde cualquier parte
 extraer_presupuesto_numero(Entrada, Numero) :-
     include(atom_number_safe, Entrada, Numeros),
     ( Numeros = [NAtom|_] ->
         atom_number(NAtom, Numero)
     ; Numero = vacio
     ).
-
-% ----------------------------
-% atom_number_safe/1
-% Verifica si un átomo puede ser convertido a número sin error.
-% ----------------------------
 atom_number_safe(Atom) :- catch(atom_number(Atom, _), _, fail).
 
 % ----------------------------
-% detectar_aerolinea_directo/2
-% Detecta la aerolínea preferida de la entrada.
-% ----------------------------
+% Aerolínea directa
 detectar_aerolinea_directo(Entrada, Aerolinea) :-
     ( member(united, Entrada), member(airlines, Entrada) -> Aerolinea = united_airlines
     ; member(copa, Entrada), member(airlines, Entrada) -> Aerolinea = copa_airlines
@@ -264,21 +197,12 @@ detectar_aerolinea_directo(Entrada, Aerolinea) :-
     ).
 
 % ----------------------------
-% contiene_negacion/1
-% Detecta palabras de negación en la entrada.
-% ----------------------------
+% Negación / afirmación para control de flujo
 contiene_negacion(Entrada) :- member(N, Entrada), member(N, [no, nunca, jamas, negativo]).
-
-% ----------------------------
-% contiene_afirmacion/1
-% Detecta palabras afirmativas en la entrada.
-% ----------------------------
 contiene_afirmacion(Entrada) :- member(S, Entrada), member(S, [si, sí, claro, afirmativo, correcto, obviamente]).
 
-% ----------------------------
-% contiene_sin_plata/1
-% Detecta frases relacionadas con 'no tengo dinero' o similares.
-% ----------------------------
+%-----------------------------
+% Verifica si la oración de no presupuesto
 contiene_sin_plata(Entrada) :-
     ( member(no, Entrada), (member(plata, Entrada); member(dinero, Entrada); member(presupuesto, Entrada)) )
     ;

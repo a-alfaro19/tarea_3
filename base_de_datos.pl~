@@ -12,7 +12,7 @@ vuelo(cm003, sjo, phx, 'Copa Airlines', economica, 6, 480).
 vuelo(cm004, sjo, lax, 'Copa Airlines', economica, 7, 520).
 vuelo(cm005, sjo, jfk, 'Copa Airlines', negocios, 5, 410).
 vuelo(cm006, sjo, pty, 'Copa Airlines', economica, 1, 130).
-vuelo(cm007, sjo, phx, 'Copa Airlines', negocios, 6, 500).
+vuelo(cm007, sjo, phx, 'Copa Airlines', negocios, 5, 500).
 vuelo(cm008, sjo, lax, 'Copa Airlines', economica, 7, 510).
 vuelo(cm009, sjo, pty, 'Copa Airlines', economica, 1, 140).
 vuelo(cm010, sjo, jfk, 'Copa Airlines', economica, 5, 390).
